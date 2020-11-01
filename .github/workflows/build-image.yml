@@ -1,0 +1,42 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Create Docker Build and Push to Registry
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the main branch
+on:
+  push:
+    branches: [ main ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: debian-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Login to MP Registry
+        uses: docker/login-action@v1 
+        with:
+          registry: registry.moneypark.ch:23000
+          username: ${{ secrets.MP_REGISTRY_USERNAME }}
+          password: ${{ secrets.MP_REGISTRY_PASSWORD }}
+           
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2.3.3
+      
+      - name: Build Docker Image
+        id: build
+        uses: ./
+        with:
+          context: ./
+          file: ./Dockerfile
+          tags: test-build-v1
+
+      - name: Push Docker Image
+        uses: docker/push-action@v1
+        with:
+          registry: registry.moneypark.ch:23000
+          tags: ${{ outputs.build.tags }}
