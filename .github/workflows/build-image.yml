@@ -39,4 +39,4 @@ jobs:
         uses: docker/push-action@v1
         with:
           registry: registry.moneypark.ch:23000
-          tags: ${{ outputs.build.tags }}
+          tags: test-build-v1
